@@ -58,6 +58,7 @@ void setup() {
   setupWiFi();
   // Milkcocoaへデータがsendされたか監視
   milkcocoa.on(MILKCOCOA_DATASTORE, "push", onSend);
+  milkcocoa.on(MILKCOCOA_DATASTORE, "push", onpush);
 };
 
 //---------------------------------------------------
@@ -75,6 +76,7 @@ void loop() {
     milkcocoa.push(MILKCOCOA_DATASTORE, &elem);
 
   }
+
   delay(1000);
 
 };
@@ -83,6 +85,12 @@ void loop() {
 void onSend(DataElement *pelem) {
 
 };
+
+void onpush(DataElement *elem) {
+
+  Serial.println(elem.getString("aaa"));
+
+}
 
 float vh() {
   float tem; //Temperature
