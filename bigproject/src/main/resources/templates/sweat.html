@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
+	lang="jp">
+<head>
+<!--/* ヘッダー：CSS */-->
+<head th:fragment="css" th:remove="tag">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<link rel="stylesheet"
+	href="../../static/bootstrap/css/bootstrap.min.css"
+	th:href="@{/bootstrap/css/bootstrap.min.css}" />
+<link rel="stylesheet" href="../../static/css/common.css"
+	th:href="@{/css/common.css}" />
+<script src="http://cdn.mlkcca.com/v2.0.0/milkcocoa.js"></script>
+
+<!--/* ヘッダー：Javascript */-->
+<head th:fragment="js" th:remove="tag">
+<script src="../../static/js/jquery.min.js"
+	th:src="@{/js/jquery.min.js}"></script>
+<script src="../../static/bootstrap/js/bootstrap.min.js"
+	th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+<script type="text/javascript"
+	th:src="@{/js/loader.js}">></script>
+</head>
+
+</head>
+<body>
+	<div class="container">
+	<div style="text-align:center">
+		<h1 style="">発汗モニタリングシステム</h1>
+	</div>
+	<br>
+	<div class="col-md-12">
+	<div class="col-md-6">
+		<form class="parsonForm" th:action="@{/submit}" method="post">
+			Height:<br> <input type="text" name="height" placeholder="175" required>
+			CM <br> Weight:<br> <input type="text" name="weight"
+				placeholder="60" required> KG <br>
+				Email：<br>
+				<input type="email" name="mail"
+				placeholder="60" required> <br>
+				Sex:<br>
+			<label for="male">男</label>
+			<input type="radio" id="male" name="male" value="0" checked>
+	  		<label for="female">女</label>
+			<input type="radio" id="female" name="male" value="1">
+			<br>
+			Age:<br>
+			<select name="example2">
+			<option value="0">10未満</option>
+			<option value="1">10~20</option>
+			<option value="2">20~30</option>
+			<option value="3">30~40</option>
+			<option value="4">40~50</option>
+			<option value="5">50~60</option>
+			<option value="6">60歳以上</option>
+			</select>
+			<br>
+			<br>
+			<input id ="btn_submit" type="button" class="btn btn-success" value="Submit">
+			<input id ="btn_reset" type="button" class="btn btn-primary" value="reset">
+			<input id ="btn_sent" type="button" class="btn btn-danger" value="sent">
+			<br>
+
+			<br>
+			<output>データ </output>
+			<label for="nosyn">非同期</label>
+			<input type="radio" id="nosyn" name="sts" value="0" checked>
+	  		<label for="syn">同期</label>
+			<input type="radio" id="syn" name="sts" value="1">
+		</form>
+		</div>
+		<input id="tempdate" type="hidden" value=""/>
+	<div class="col-md-6">
+		<div class="col-md-6">
+	 		<img id="img" border="0" th:src="@{/img/red.jpg}" width="190" height="190" alt="">
+	 	</div>
+	 	<div class="col-md-6">
+ 			<output title="必要水分量＝体重(kg)×33" for="na4 nb4" id="op4"> 必要水分量＝ </output>
+		<br>
+		<output title="不感蒸泄量＝体重(kg)×15+200×(体温−36.8)" for="na4 nb4" id="op4">
+			不感蒸泄量＝</output>
+		<br>
+		<output title="身長^0.725×体重^0.425×0.007184" for="na4 nb4" id="op4">
+			体表面積＝</output>
+		<br>脱水状態：
+		<br>
+		<input type="radio" id="level0" name="level" value="0" checked>
+		<label for="level0">不脱水</label>
+		<input type="radio" id="level1" name="level" value="1">
+		<label for="level1">軽度</label>
+		<input type="radio" id="level2" name="level" value="2">
+		<label for="level2">中度</label>
+		<input type="radio" id="level3" name="level" value="3">
+		<label for="level3">重度</label>
+		<br>
+	<div class="btn-group btn-group-justified">
+	  <a href="#" class="btn btn-primary">飲水</a>
+	  <a href="#" class="btn btn-danger">排水</a>
+	</div>
+	 	<div class="col-md-16">
+		    <output for="na4 nb4" id="op4"> 脱水率:</output>
+		 	<div class="progress">
+			    <div class="progress-bar progress-bar-striped progress-bar-danger active" role="progressbar"
+			    aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:70%">
+			      70%
+			    </div>
+		    </div>
+	 	</div>
+	</div>
+	</div>
+	<div class="col-md-12">
+	<div id="chart_div"></div>
+	<div id="graphdiv"></div>
+	</div>
+	</div>
+</div>
+</body>
+<script type="text/javascript">
+var tbl="";
+var flg=0;
+// Milkcocoaに接続
+var milkcocoa = new MilkCocoa('vuejb91il2k.mlkcca.com');
+// データストアを取得
+var ds = milkcocoa.dataStore('test');
+function getImg(flg){
+	if(flg==0){
+		$("img").attr({"src":"/img/green.jpg"});
+		$('input[name="level"]:eq(0)').prop('checked', true)
+	}else if(flg==1){
+		$("img").attr({"src":"/img/green.jpg"});
+		$('input[name="level"]:eq(1)').prop('checked', true)
+	}else if(flg==2){
+		$("img").attr({"src":"/img/yellow.jpg"});
+		$('input[name="level"]:eq(2)').prop('checked', true)
+	}else{
+		$("img").attr({"src":"/img/red.jpg"});
+		$('input[name="level"]:eq(3)').prop('checked', true)
+	}
+
+}
+function getDate(){
+	  ds.stream().next(function(err, datas){
+	    // データストアの最新メッセージ
+	    var x=0, y;
+	    var size = datas.length;
+	    var temp;
+ 		tbl = new Array(size);
+	    datas.forEach(function(data) {
+				i=x+1;
+				temp =[i,parseFloat(data.value.tmp)];
+				flg = parseFloat(data.value.flg);
+				getImg(flg);
+				tbl[x]=temp;
+				x++;
+           });
+		$("#tempdate").val(tbl);
+		drawBasic();
+	  });
+	};
+function drawBasic() {
+		var data = new google.visualization.DataTable();
+		data.addColumn('number', 'X');
+		data.addColumn('number', 'sweat');
+		var dates =$("#tempdate").val();
+		if(tbl === ""){
+			data.addRows([
+				]);
+		}else{
+			data.addRows(tbl);
+		}
+
+		var options = {
+			hAxis: {
+				title: 'Time/Min'
+			},
+			vAxis: {
+				title: 'sweat/mL'
+			}
+		};
+
+		var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+
+		chart.draw(data, options);
+	};
+$( function() {
+	var testTimer;
+	$('input[name="sts"]').click(function() {
+	if($('input[name="sts"]:checked').val()==1){
+		testTimer =setInterval(function(){
+	    $.ajax({
+	     type :"GET",
+	     url: "ajax",
+	     success: function(data) {
+	    	 		  getDate();
+	              },
+	     error: function(data) {
+	                  alert("error。");
+	            }
+	   });
+	    },500);
+	}else{
+		clearInterval(testTimer);
+	}
+	})
+
+	google.charts.load('current', {
+		packages: ['corechart', 'line']
+	});
+	google.charts.setOnLoadCallback(drawBasic);
+
+
+}
+	);
+</script>
+</html>
