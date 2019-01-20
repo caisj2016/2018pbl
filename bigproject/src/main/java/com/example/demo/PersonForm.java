@@ -11,7 +11,7 @@ public class PersonForm {
 	//メールアドレス
 	private String email;
 	//性別
-	private String sex;
+	private String male;
 	//年齢
 	private String age;
 }
