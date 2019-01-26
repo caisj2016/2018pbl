@@ -120,7 +120,7 @@ public class ApiService {
 
 	private void output(String level) throws InterruptedException, JSONException, MilkcocoaException {
 		//MilkCocoa milkCocoa = new MilkCocoa("vuejqw4qlb9.mlkcca.com");
-		MilkCocoa milkCocoa = new MilkCocoa("vuejb91il2k.mlkcca.com");
+		MilkCocoa milkCocoa = new MilkCocoa("vuejqw4qlb9.mlkcca.com");
 		DataStore dataOutputStore = milkCocoa.dataStore("test");
 		//DataStore dataOutputStore = milkCocoa.dataStore("test2");
 		Streaming streaming = dataOutputStore.streaming();

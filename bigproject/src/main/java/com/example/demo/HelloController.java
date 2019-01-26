@@ -15,8 +15,9 @@ import com.mlkcca.client.MilkcocoaException;
 public class HelloController {
 	@ModelAttribute
 	PersonForm setupForm() {
-	    return new PersonForm();
+		return new PersonForm();
 	}
+
 	@Autowired
 	private ApiService apiService;
 
@@ -28,7 +29,7 @@ public class HelloController {
 
 	@RequestMapping(value = "/index", method = RequestMethod.GET)
 	public String index1(Model model) {
-		 model.addAttribute("personForm", new PersonForm());
+		model.addAttribute("personForm", new PersonForm());
 		return "sweat";
 	}
 
@@ -44,15 +45,17 @@ public class HelloController {
 	}
 
 	@RequestMapping(value = "/kesang")
-	public String kesang(Model model,PersonForm personForm,@RequestParam("datakey") String datakey) throws InterruptedException, JSONException, MilkcocoaException {
-		String level =apiService.getLevel(personForm,datakey);
-		model.addAttribute("drink", apiService.getdrink(personForm,level));
+	public String kesang(Model model, PersonForm personForm, @RequestParam("datakey") String datakey)
+			throws InterruptedException, JSONException, MilkcocoaException {
+		if (personForm.getHeight() != null && personForm.getWeight() != null) {
+			String level = apiService.getLevel(personForm, datakey);
+			model.addAttribute("drink", String.valueOf(apiService.getdrink(personForm, level)));
+		}
 		return "sweat";
 	}
 
-
 	@RequestMapping(value = "/mail")
-	public String sendMail(PersonForm personForm, Model model ,@RequestParam("mail") String mail) {
+	public String sendMail(PersonForm personForm, Model model, @RequestParam("mail") String mail) {
 		apiService.sentmail(mail);
 		return "sweat";
 	}

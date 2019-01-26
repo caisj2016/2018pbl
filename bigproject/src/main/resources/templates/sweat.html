@@ -130,7 +130,7 @@ var tbl="";
 var myMaps="";
 var flg=0;
 // Milkcocoaに接続
-var milkcocoa = new MilkCocoa('vuejb91il2k.mlkcca.com');
+var milkcocoa = new MilkCocoa('vuejqw4qlb9.mlkcca.com');
 // データストアを取得
 var ds = milkcocoa.dataStore('test');
 function getImg(flg){
@@ -180,7 +180,7 @@ function getDate(){
 	    var tempdate;
  		tbl = new Array(size);
  		var tbltemp =new Array(size);
- 		var myMap = new Array();
+ 		var myMap = new Map();
  		myMaps = new Array(size);
 	    datas.forEach(function(data) {
 				i=x+1;
@@ -191,9 +191,10 @@ function getDate(){
 				tbl[x]=temp;
 				tbltemp[x]=tempdate
 				//
-				myMap.push(parseFloat(data.timestamp));
-				myMap.push(parseFloat(data.value.tmp));
-				myMaps[0]=myMap;
+				var date1 = new Date(data.timestamp*1000);
+				myMap.set("timestamp",date1);
+				myMap.set("tmp",parseFloat(data.value.tmp));
+				myMaps[x]=myMap;
 				x++;
            });
 		$("#tempdate").val(tbltemp);
@@ -213,10 +214,10 @@ function drawBasic() {
 
 		var options = {
 			hAxis: {
-				title: 'Time/Min'
+				title: 'Time/S'
 			},
 			vAxis: {
-				title: 'sweat/mL'
+				title: 'sweat/μg'
 			}
 		};
 
