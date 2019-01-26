@@ -7,14 +7,13 @@
 
 /************************* WiFi Access Point *********************************/
 // Wi-Fi SSID
-#define WLAN_SSID       "Test001"
+#define WLAN_SSID       "Gongrui"
 // Wi-Fi PASSWORD
-#define WLAN_PASS       "hashimoto"
+#define WLAN_PASS       "12345678"
 /************************* Your Milkcocoa Setup *********************************/
 
 #define MILKCOCOA_APP_ID      "vuejb91il2k"
 #define MILKCOCOA_DATASTORE   "test"
-#define MILKCOCOA_DATASTORE_2   "test2"
 /************* Milkcocoa Setup (you don't need to change this!) ******************/
 
 #define MILKCOCOA_SERVERPORT  1883
@@ -52,12 +51,17 @@ void setupWiFi() {
 }
 
 //---------------------------------------------------
+int led = 16;                // the pin that the LED is atteched to
+int sensor = 13;              // the pin that the sensor is atteched to   D7
 void setup() {
+  pinMode(led, OUTPUT);      // initalize LED as an output
+  pinMode(sensor, INPUT);
+  pinMode(14, OUTPUT); //d5
   Serial.begin(115200);
   dht.begin();
   setupWiFi();
   // Milkcocoaへデータがpushされたか監視
-  milkcocoa.on(MILKCOCOA_DATASTORE_2, "push", onpush);
+  milkcocoa.on(MILKCOCOA_DATASTORE, "push", onpush);
 };
 
 //---------------------------------------------------
@@ -67,12 +71,11 @@ void loop() {
   DataElement elem = DataElement();
   float tmp = vh();
   // 以下のようにkey, valueを設定していきます。
+  sr602();
 
-  if (tmp > 0 && tmp < 99999.0){
-  elem.setValue("tmp", tmp*100);
-
-    // データストア名を指定して、データをpushもしくはsendします
-    milkcocoa.push(MILKCOCOA_DATASTORE, &elem);
+  if (tmp > 0 && tmp < 99999.0) {
+    elem.setValue("tmp", tmp * 10);
+    milkcocoa.push(MILKCOCOA_DATASTORE, &elem);     // データストア名を指定して、データをpushもしくはsendします
 
   }
 
@@ -82,8 +85,16 @@ void loop() {
 //---------------------------------------------------
 
 void onpush(DataElement *elem) {
-  Serial.println(elem->getString("level"));
-
+  String level=elem->getString("level");
+  if(level=="1"){
+    level1();
+  }else if(level=="2"){
+    level2();
+  }else if(level=="3"){
+    level3();
+  }else{
+  //動作無し
+  }
 }
 
 float vh() {
@@ -104,3 +115,36 @@ float vh() {
   m = vh * v / s * e;
   return m;
 }
+
+int sr602() {
+  int resultcode;
+  int val = digitalRead(sensor);   // read sensor value
+  if (val == HIGH) {          // check if the sensor is HIGH
+    digitalWrite(led, HIGH);
+    resultcode = 1;
+  } else {
+    digitalWrite(led, LOW);
+    resultcode = 0;
+  }
+  return resultcode;
+}
+
+void level1() {
+  digitalWrite( 14, HIGH );
+  delay( 3000 );
+  digitalWrite( 14, LOW);
+}
+
+void level2() {
+  for (int i = 0; i <= 2; i++) {
+    digitalWrite( 14, HIGH );
+    delay( 3000 );
+    digitalWrite( 14, LOW);
+    delay( 3000 );
+  }
+
+void level3() {
+    while (1) {
+      digitalWrite( 14, HIGH );
+    }
+};
