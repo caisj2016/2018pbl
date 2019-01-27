@@ -1,5 +1,8 @@
 package com.example.demo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -8,6 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.mlkcca.client.MilkcocoaException;
 
@@ -39,19 +43,22 @@ public class HelloController {
 		double bsa = Math.pow(Double.valueOf(personForm.getHeight()), 0.725)
 				* Math.pow(Double.valueOf(personForm.getWeight()), 0.425) * 0.007184; // 体表面積
 		model.addAttribute("bsa", bsa);
-		model.addAttribute("drink", "");
+		model.addAttribute("drink", null);
 		model.addAttribute("wc", String.valueOf(getWc(personForm)));
 		return "sweat";
 	}
 
 	@RequestMapping(value = "/kesang")
-	public String kesang(Model model, PersonForm personForm, @RequestParam("datakey") String datakey)
-			throws InterruptedException, JSONException, MilkcocoaException {
-		if (personForm.getHeight() != null && personForm.getWeight() != null) {
-			String level = apiService.getLevel(personForm, datakey);
-			model.addAttribute("drink", String.valueOf(apiService.getdrink(personForm, level)));
+	@ResponseBody
+	public List<String> kesang(Model model, @RequestParam("height") String height, @RequestParam("weight") String weight,
+			@RequestParam("datakey") String datakey) throws InterruptedException, JSONException, MilkcocoaException {
+		List<String> list = new ArrayList<String>();
+		if (!"".equals(height) && !"".equals(weight)) {
+			String level = apiService.getLevel(height, weight, datakey);
+    		list.add(String.valueOf(apiService.getdrink(height, weight, level)));
+    		list.add(level);
 		}
-		return "sweat";
+		return list;
 	}
 
 	@RequestMapping(value = "/mail")

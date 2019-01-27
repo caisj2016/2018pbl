@@ -22,22 +22,22 @@ public class ApiService {
 	@Autowired
 	private MailSender sender;
 
-	public String getLevel(PersonForm personForm, String datakey)
+	public String getLevel(String height, String weight, String datakey)
 			throws InterruptedException, JSONException, MilkcocoaException {
 		String keys[] = datakey.split(",");
 		int size = keys.length;
-		int maxtotel = 0;
-		if (size < 60) {
+		double maxtotel = 0;
+		if (size < 30) {
 			return "0";
 		} else {
-			int sizehead = size - 60;
+			int sizehead = size - 30;
 			for (int i = sizehead; i < size; i++) {
-				maxtotel = +Integer.valueOf(keys[i]);
+				maxtotel = +Double.valueOf(keys[i]);
 			}
 		}
-		int m = Integer.valueOf(personForm.getWeight());
+		int m = Integer.valueOf(weight);
 		int h; // 身長
-		int age = Integer.valueOf(personForm.getAge());
+		int age = Integer.valueOf(height);
 		double s_skin;
 		String level = "0";
 		if (age < 20) {
@@ -48,7 +48,7 @@ public class ApiService {
 			s_skin = m * 30 - m * 16 - m * 7;
 		}
 
-		float s_total = maxtotel * 15;
+		double s_total = maxtotel * 2 * 15;
 
 		if (s_total <= s_skin / 96 && s_total < 0.01 * m / 96) {
 			output("0");
@@ -65,10 +65,10 @@ public class ApiService {
 		return level;
 	}
 
-	public double getdrink(PersonForm personForm, String level) {
-		int m = Integer.valueOf(personForm.getWeight());
+	public double getdrink(String height, String weight, String level) {
+		int m = Integer.valueOf(weight);
 		int h; // 身長
-		int age = Integer.valueOf(personForm.getAge());
+		int age = Integer.valueOf(height);
 		double drink;
 		double s_skin;
 		if (age < 20) {
@@ -108,7 +108,7 @@ public class ApiService {
 		return drink;
 	}
 
-	public void sentmail(String  mail) {
+	public void sentmail(String mail) {
 		SimpleMailMessage msg = new SimpleMailMessage();
 
 		msg.setFrom("caisjtest@gmail.com");
@@ -119,10 +119,9 @@ public class ApiService {
 	}
 
 	private void output(String level) throws InterruptedException, JSONException, MilkcocoaException {
-		//MilkCocoa milkCocoa = new MilkCocoa("vuejqw4qlb9.mlkcca.com");
-		MilkCocoa milkCocoa = new MilkCocoa("vuejqw4qlb9.mlkcca.com");
-		DataStore dataOutputStore = milkCocoa.dataStore("test");
-		//DataStore dataOutputStore = milkCocoa.dataStore("test2");
+		// MilkCocoa milkCocoa = new MilkCocoa("vuejb91il2k.mlkcca.com");
+		MilkCocoa milkCocoa = new MilkCocoa("vuejb91il2k.mlkcca.com");
+		DataStore dataOutputStore = milkCocoa.dataStore("test2");
 		Streaming streaming = dataOutputStore.streaming();
 		streaming.size(1);
 		streaming.addStreamingListener(new StreamingListener() {
@@ -145,8 +144,6 @@ public class ApiService {
 		dataOutputStore.addDataStoreEventListener(new DataStoreEventListener() {
 			@Override
 			public void onPushed(DataElement dataElement) {
-				System.out.print("onPushed:");
-				System.out.println(dataElement.getValue());
 			}
 
 			@Override
@@ -156,7 +153,6 @@ public class ApiService {
 
 			@Override
 			public void onSended(DataElement dataElement) {
-				System.out.print("onSended:");
 				// System.out.println(dataElement.getValue());
 			}
 
@@ -165,16 +161,13 @@ public class ApiService {
 
 			}
 		});
-		dataOutputStore.on("push");
+		dataOutputStore.on("send");
 
-		while (true) {
-			Thread.sleep(1000);
-			DataElementValue params = new DataElementValue();
-			params.put("level", level);
-			System.out.println(level);
-			dataOutputStore.push(params);
+		DataElementValue params = new DataElementValue();
+		params.put("level", level);
+		System.out.println("sent level :"+level);
+		dataOutputStore.send(params);
 
-		}
 
 	}
 }

@@ -87,7 +87,7 @@
 		<br>
 		<output title="" for="na4 nb4" id="op4">
 			補充水量＝</output>
-			<span  class="reset" th:utext="*{drink != null}? *{drink} : ''"></span >
+			<span id="drink" class="reset" th:text="*{drink != null}? *{drink} : ''"></span >
 		<br>
 		<output title="身長^0.725×体重^0.425×0.007184" for="na4 nb4" id="op4">
 			体表面積＝</output>
@@ -130,9 +130,10 @@ var tbl="";
 var myMaps="";
 var flg=0;
 // Milkcocoaに接続
-var milkcocoa = new MilkCocoa('vuejqw4qlb9.mlkcca.com');
+var milkcocoa = new MilkCocoa('vuejb91il2k.mlkcca.com');
 // データストアを取得
 var ds = milkcocoa.dataStore('test');
+var ds2 = milkcocoa.dataStore('test2');
 function getImg(flg){
 	if(flg==0){
 		$("img").attr({"src":"/img/green.jpg"});
@@ -150,20 +151,20 @@ function getImg(flg){
 		$("img").attr({"src":"/img/red.jpg"});
 		$('input[name="level"]:eq(3)').prop('checked', true)
 		var mail=$('input[name="email"]').val();
-	if($("#mailflg").val()===''){
-	    $.ajax({
-		     type :"POST",
-		     url: "mail",
-		     dataType: 'json',
-		     data:{mail : mail},
-		     success: function (data) {
-		    	$("#mailflg").val("1");
-		     },
-		     error: function () {
-		         alert("error");
-		     }
-		   });
-	}
+		if($("#mailflg").val()==='' && mail !='' ){
+		    $.ajax({
+			     type :"POST",
+			     url: "mail",
+			     dataType: 'json',
+			     data:{mail : mail},
+			     success: function (data) {
+			    	$("#mailflg").val("1");
+			     },
+			     error: function () {
+			         alert("error");
+			     }
+			   });
+		}
 
 	}else{
 		$("img").attr({"src":"/img/green.jpg"});
@@ -186,8 +187,6 @@ function getDate(){
 				i=x+1;
 				temp =[i,parseFloat(data.value.tmp)];
 				tempdate = parseFloat(data.value.tmp);
-				flg = parseFloat(data.value.flg);
-				getImg(flg);
 				tbl[x]=temp;
 				tbltemp[x]=tempdate
 				//
@@ -200,6 +199,9 @@ function getDate(){
 		$("#tempdate").val(tbltemp);
 		drawBasic();
 	  });
+
+
+
 	};
 function drawBasic() {
 		var data = new google.visualization.DataTable();
@@ -232,13 +234,24 @@ $( function() {
 		testTimer =setInterval(function(){
 	 	getDate();
 	 	var datakey=$("#tempdate").val();
+	 	var weight=$('input[name="weight"]').val();
+	 	var height=$('input[name="height"]').val();
 	    $.ajax({
 	     type :"POST",
 	     url: "kesang",
 	     dataType: 'json',
-	     data:{datakey : datakey},
-	   });
-	    },500);
+	     data:{datakey : datakey,
+	    	 weight:weight,
+	    	 height:height},
+	    success: function(json_data) {
+	        $("#drink").text(json_data[0]);
+	        getImg(json_data[1]);
+          },
+          error: function(json_data) {
+  	   		console.log("err");
+          }
+	   })
+	    },1000);
 	}else{
 		clearInterval(testTimer);
 	}

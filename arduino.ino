@@ -14,6 +14,8 @@
 
 #define MILKCOCOA_APP_ID      "vuejb91il2k"
 #define MILKCOCOA_DATASTORE   "test"
+#define MILKCOCOA_DATASTORE2  "test2"
+
 /************* Milkcocoa Setup (you don't need to change this!) ******************/
 
 #define MILKCOCOA_SERVERPORT  1883
@@ -61,7 +63,7 @@ void setup() {
   dht.begin();
   setupWiFi();
   // Milkcocoaへデータがpushされたか監視
-  milkcocoa.on(MILKCOCOA_DATASTORE, "push", onpush);
+  milkcocoa.on(MILKCOCOA_DATASTORE2, "send", onsend);
 };
 
 //---------------------------------------------------
@@ -84,7 +86,7 @@ void loop() {
 };
 //---------------------------------------------------
 
-void onpush(DataElement *elem) {
+void onsend(DataElement *elem) {
   String level=elem->getString("level");
   if(level=="1"){
     level1();
