@@ -144,7 +144,7 @@ void level2() {
     digitalWrite( 14, LOW);
     delay( 3000 );
   }
-
+}
 void level3() {
     while (1) {
       digitalWrite( 14, HIGH );
