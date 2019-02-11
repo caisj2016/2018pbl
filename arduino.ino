@@ -12,7 +12,7 @@
 #define WLAN_PASS       "12345678"
 /************************* Your Milkcocoa Setup *********************************/
 
-#define MILKCOCOA_APP_ID      "vuejb91il2k"
+#define MILKCOCOA_APP_ID      "juicejrzldz9x"
 #define MILKCOCOA_DATASTORE   "test"
 #define MILKCOCOA_DATASTORE2  "test2"
 
